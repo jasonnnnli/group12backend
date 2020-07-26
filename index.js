@@ -28,7 +28,13 @@ app.use('/login', require('./routes/login.js'));
 let middleware = require('./utilities/middleware');
 app.use('/register', require('./routes/register.js'));
 app.use("/", require('./routes/coursessql.js'));
-
+app.get("/wait", (req, res) => {
+    setTimeout(() => {
+        res.send({
+            message: "Thanks for waiting"
+        });
+    }, 1000);
+});
 /*
  * Return HTML for the / end point. 
  * This is a nice location to document your web service API
