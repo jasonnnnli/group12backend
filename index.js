@@ -24,9 +24,9 @@ if(!db) {
  * Hello world functions below...
  */
 /** TO DO */
-//app.use('/login', require('./routes/login.js'));
+app.use('/login', require('./routes/login.js'));
 //let middleware = require('./utilities/middleware');
-//app.use('/register', require('./routes/register.js'));
+app.use('/register', require('./routes/register.js'));
 
 /*
  * Return HTML for the / end point. 
