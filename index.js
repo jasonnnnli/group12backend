@@ -25,8 +25,9 @@ if(!db) {
  */
 /** TO DO */
 app.use('/login', require('./routes/login.js'));
-//let middleware = require('./utilities/middleware');
+let middleware = require('./utilities/middleware');
 app.use('/register', require('./routes/register.js'));
+app.use("/", require('./routes/coursessql.js'));
 
 /*
  * Return HTML for the / end point. 
