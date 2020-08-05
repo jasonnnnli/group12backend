@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS Device;
+CREATE TABLE Device (Devicename VARCHAR(255) NOT NULL,
+Decicedetail VARCHAR(255) NOT NULL
+	CONSTRAINT CdevicePK PRIMARY KEY (Devicename)
+  );
