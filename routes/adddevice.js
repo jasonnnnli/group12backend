@@ -53,7 +53,7 @@
 //             //Therefore, let the requester know they tried to create an account that already exists
 //             res.send({
 //                 success: false,1+!
-//                 error: err
+//                 error: err231123
 //             });
 //         });
 //     } else {
