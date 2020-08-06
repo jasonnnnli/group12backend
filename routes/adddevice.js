@@ -52,7 +52,7 @@
 //             //If we get an error, it most likely means the account already exists
 //             //Therefore, let the requester know they tried to create an account that already exists
 //             res.send({
-//                 success: false,
+//                 success: false,1+!
 //                 error: err
 //             });
 //         });
