@@ -1,4 +1,0 @@
-DROP TABLE IF EXISTS Device;
-CREATE TABLE Device (Devicename VARCHAR(255) PRIMARY KEY,
-Decicedetail VARCHAR(255) NOT NULL
-  );
