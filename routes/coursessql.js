@@ -56,3 +56,5 @@ router.get("/courses", (req, res) => {
     });
 });
 
+
+module.exports = router;

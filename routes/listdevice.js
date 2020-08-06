@@ -13,7 +13,7 @@ router.get("/devices", (req, res) => {
         .then((data) => {
             res.send({
                 success: true,
-                devices: data
+                Devices: data
             });
         }).catch((error) => {
         console.log(error);
