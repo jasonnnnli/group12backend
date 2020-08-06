@@ -47,7 +47,7 @@
 //                 });
 //                 sendEmail("uwnetid@uw.edu", email, "Welcome!", "<strong>Welcome to our app!</strong>");
 //             }).catch((err) => {
-//             //log the error
+//             //log the error1+1
 //             console.log(err);
 //             //If we get an error, it most likely means the account already exists
 //             //Therefore, let the requester know they tried to create an account that already exists
