@@ -4,6 +4,6 @@ CREATE TABLE Review (Username VARCHAR(255) NOT NULL UNIQUE,
                        Reviewcontent VARCHAR(255) NOT NULL ,
                        Rating VARCHAR(255) NOT NULL,
                        CONSTRAINT ReviewFK FOREIGN KEY (Username) REFERENCES members (Username),
-                      	CONSTRAINT ReviewFK FOREIGN KEY (Devicename) REFERENCES Device (Devicename)
+                      	CONSTRAINT ReviedwFK FOREIGN KEY (Devicename) REFERENCES Device (Devicename)
 
   );
