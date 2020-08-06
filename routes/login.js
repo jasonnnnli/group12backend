@@ -18,7 +18,7 @@ let config = {
     secret: process.env.JSON_WEB_TOKEN
 };
 
-router.post('/login', (req, res) => {
+router.post('/', (req, res) => {
     let email = req.body['email'];
     let theirPw = req.body['password'];
     let wasSuccessful = false;

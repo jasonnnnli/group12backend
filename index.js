@@ -29,8 +29,8 @@ if(!db) {
 app.use('/login', require('./routes/login.js'));
 let middleware = require('./utilities/middleware');
 app.use('/register', require('./routes/register.js'));
-app.use('/adddevices', require('./routes/adddevice.js'));
-app.use('/device', require('./routes/listdevice.js'));
+app.use('/', require('./routes/adddevice.js'));
+app.use('/', require('./routes/listdevice.js'));
 app.get("/wait", (req, res) => {
     setTimeout(() => {
         res.send({
