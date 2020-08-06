@@ -17,7 +17,7 @@ const bodyParser = require("body-parser");
 //This allows parsing of the body of POST requests, that are encoded in JSON
 router.use(bodyParser.json());
 
-router.post('/', (req, res) => {
+router.post('/register', (req, res) => {
     res.type("application/json");
 
     //Retrieve data from query params
