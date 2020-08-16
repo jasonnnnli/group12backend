@@ -33,6 +33,7 @@ app.use('/', require('./routes/adddevice.js'));
 app.use('/', require('./routes/listdevice.js'));
 app.use('/', require('./routes/listreview.js'));
 app.use('/', require('./routes/addreview.js'));
+app.use('/', require('./routes/loginusername.js'))
 app.get("/wait", (req, res) => {
     setTimeout(() => {
         res.send({
