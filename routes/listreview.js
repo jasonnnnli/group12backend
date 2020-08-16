@@ -8,7 +8,7 @@ const bodyParser = require("body-parser");
 router.use(bodyParser.json());
 router.get("/reviews", (req, res) => {
 
-    db.manyOrNone('SELECT * FROM reviews')
+    db.manyOrNone('SELECT * FROM Reviews')
         //If successful, run function passed into .then()
         .then((data) => {
             res.send({
