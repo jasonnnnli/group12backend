@@ -4,63 +4,17 @@ let db = require('./sqlconn.js');
 
 //We use this create the SHA256 hash
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
 
-/**
- * Jsonwebtoken used for creating tokens/verifying
- */
-const jwt = require("jsonwebtoken");
-config = {
-    secret: process.env.JSON_SECRET
-};
-const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: process.env.EMAIL_SENDER,
-        pass: process.env.EMAIL_AUTH
-    }
-});
-function sendEmail(from, receiver, subj, textMessage/*, htmlMessage*/) {
-    let mailOptions = {
-        from: from,
-        to: receiver,
-        subject: subj,
-        text: textMessage/*,
-        html: htmlMessage*/
-    };
+function sendEmail(from, receiver, subj, message) {
+    //research nodemailer for sending email from node.
+    // https://nodemailer.com/about/
+    // https://www.w3schools.com/nodejs/nodejs_email.asp
+    //create a burner gmail account
+    //make sure you add the password to the environmental variables
+    //similar to the DATABASE_URL and PHISH_DOT_NET_KEY (later section of the lab)
 
-    transporter.sendMail(mailOptions, function(error, info) {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log('Email sent: ' + info.response);
-        }
-    });
-}//TODO: Really Tyler? Abstract this out bruh... or just use sendEmail
-function sendChangePasswordEmail(receiver, first, last) {
-    let token = jwt.sign({email: receiver},
-        config.secret,
-        {
-            expiresIn: '1H' // expires in 1 hours
-        }
-    );
-    const subj = "Griffin Change Password Request";
-
-    // Nodemailer sends user verification link
-    let emailText = "Dear " + first + " " + last + ",\n\nSomebody has requested that the password"
-        + " tied to this email be changed. If this was not you, please contact support as your account may"
-        + " have been compromised!\n"
-        + "Please click on the following link to continue with the password change request"
-        + "; the link will expire in 1 hour.\n";
-
-    //TODO: needs splash page
-    let passwordChangeLink = "https://team12-services-backend.herokuapp.com/support?mode=r&name=" + token;
-
-    // let recoveryLink = "http://localhost:5000/support?name=" + token;
-    // let emailHtml = emailText + '<a href="' + recoveryLink + token + '"><H2>Verification link</H2></a>';
-    emailText = emailText + passwordChangeLink;
-    sendEmail(process.env.EMAIL_SENDER, receiver, subj,
-        emailText);
+    //fake sending an email for now. Post a message to logs.
+    console.log('Email sent: ' + message);
 }
 
 /**
@@ -74,5 +28,5 @@ function getHash(pw, salt) {
 }
 
 module.exports = {
-    pool, getHash, sendChangePasswordEmail,
+    db, getHash, sendEmail
 };
