@@ -8,7 +8,7 @@ const bodyParser = require("body-parser");
 router.use(bodyParser.json());
 router.get("/devices", (req, res) => {
 
-    db.manyOrNone('SELECT Devicename FROM devices')
+    db.manyOrNone('SELECT Devicename,deciceprice FROM devices')
         //If successful, run function passed into .then()
         .then((data) => {
             res.send({
