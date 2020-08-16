@@ -14,7 +14,7 @@ router.post("/addreviews", (req, res) => {
     let Reviewcontent = req.body['Reviewcontent'];
     let Rating = req.body['Rating'];
 
-    if (Username && Devicename && Reviewcontent && Rating) {
+        if (Username && Devicename && Reviewcontent && Rating) {
         db.none("INSERT INTO reviews VALUES ($1, $2, $3, $4)", [Username, Devicename, Reviewcontent, Rating])
             .then(() => {
                 //We successfully added the course, let the user know

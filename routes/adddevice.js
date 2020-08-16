@@ -10,9 +10,9 @@ router.use(bodyParser.json());
 router.post("/adddevices", (req, res) => {
     let Devicename = req.body['Devicename'];
     let Decicedetail = req.body['Decicedetail'];
-
+    let Deciceprice = req.body['Deciceprice'];
     if (Devicename && Decicedetail) {
-        db.none("INSERT INTO devices VALUES ($1, $2)", [Devicename, Decicedetail])
+        db.none("INSERT INTO devices VALUES ($1, $2,$3)", [Devicename, Decicedetail,Deciceprice])
             .then(() => {
                 res.send({
                     success: true
