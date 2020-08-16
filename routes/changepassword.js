@@ -13,7 +13,7 @@ let router = express.Router();
 /**
  * sendRecoveryEmail function in utilities utilizing Nodemailer
  */
-let sendChangePasswordEmail = require('../utilities/utils').sendChangePasswordEmail;
+let sendChangePasswordEmail = require('../utilities/utilsss').sendChangePasswordEmail;
 
 /**
  * Package for parsing JSON
@@ -28,7 +28,7 @@ router.use(bodyParser.json());
 /**
  * Accessing postgresql Heroku database
  */
-let pool = require('../utilities/utils').pool;
+let pool = require('../utilities/utilsss').pool;
 
 /**
  * Jsonwebtoken used for creating tokens/verifying
