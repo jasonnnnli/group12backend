@@ -13,7 +13,7 @@ router.get("/reviews", (req, res) => {
         .then((data) => {
             res.send({
                 success: true,
-                Devices: data
+                Reviews: data
             });
         }).catch((error) => {
         console.log(error);
