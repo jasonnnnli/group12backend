@@ -5,7 +5,8 @@ let db = require('./sqlconn.js');
 //We use this create the SHA256 hash
 const crypto = require("crypto");
 const FormData = require("form-data");
-var nodemailer = require('nodemailer');
+const nodemailer = require('nodemailer');
+
 /**
  * encrypt/decrypt found from : http://lollyrock.com/articles/nodejs-encryption/
  */
