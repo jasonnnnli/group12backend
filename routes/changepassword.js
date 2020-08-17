@@ -1,7 +1,6 @@
 //express is the framework we're going to use to handle requests
 const express = require('express');
 const crypto = require("crypto");
-
 let router = express.Router();
 let getHash = require('../utilities/utils').getHash;
 
@@ -15,14 +14,14 @@ router.use(bodyParser.json());
 
 router.post('/changepassword', (req, res) => {
     let email = req.body['email'];
-    let  firstname = req.body['firstname'];
-    let  lastname = req.body['lastname'];
-    let   username = req.body['username'];
+    // let  firstname = req.body['firstname'];
+    // let lastname = req.body['lastname'];
+    // let username = req.body['username'];firstname &&lastname && username ,firstnamev=$2, lastname=$3,username=$4,[firstname],[lastname],[username]
     let newPassword = req.body['newPassword'];
     let wasSuccessful = false;
-    if(email && firstname &&lastname && username && newPassword) {
+    if(email && newPassword) {
         //Using the 'one' method means that only one row should be returned
-        db.one('SELECT Email FROM Members WHERE Email=$1 ,firstnamev=$2, lastname=$3,username=$4', [email],[firstname],[lastname],[username])
+        db.one('SELECT Email FROM Members WHERE Email=$1 ', [email])
             .then(row => { //If successful, run function passed into .then()
 
                 var newPassword = req.body['newPassword'];
