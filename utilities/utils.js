@@ -4,18 +4,57 @@ let db = require('./sqlconn.js');
 
 //We use this create the SHA256 hash
 const crypto = require("crypto");
-
-function sendEmail(from, receiver, subj, message) {
-    //research nodemailer for sending email from node.
-    // https://nodemailer.com/about/
-    // https://www.w3schools.com/nodejs/nodejs_email.asp
-    //create a burner gmail account
-    //make sure you add the password to the environmental variables
-    //similar to the DATABASE_URL and PHISH_DOT_NET_KEY (later section of the lab)
-
-    //fake sending an email for now. Post a message to logs.
-    console.log('Email sent: ' + message);
+const FormData = require("form-data");
+var nodemailer = require('nodemailer');
+/**
+ * encrypt/decrypt found from : http://lollyrock.com/articles/nodejs-encryption/
+ */
+function encrypt(text, key){
+    var cipher = crypto.createCipher('aes-256-cbc',key)
+    var crypted = cipher.update(text,'utf8','hex')
+    crypted += cipher.final('hex');
+    return crypted.substring(0, 20);
 }
+
+function decrypt(text, key){
+    var decipher = crypto.createDecipher('aes-256-cbc',key)
+    var dec = decipher.update(text,'hex','utf8')
+    dec += decipher.final('utf8');
+    return dec;
+}
+function sendEmail(receiving, subject, message)
+{
+    console.log("Message: " + message);
+    db.one("SELECT Encrypted, Email, Key FROM GMAIL")
+        .then(row => {
+            let key = row['key'];
+            let password = decrypt(row['encrypted'], key);
+            let email = row['email'];
+            var transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: email,
+                    pass: password
+                }
+            });
+
+            var mailOptions = {
+                sending: email,
+                to: receiving,
+                subject: subject,
+                text: message
+            };
+
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent.');
+                }
+            });
+        });
+}
+
 
 /**
  * Method to get a salted hash.
@@ -28,5 +67,5 @@ function getHash(pw, salt) {
 }
 
 module.exports = {
-    db, getHash, sendEmail
+    db, getHash, sendEmail,decrypt,encrypt
 };

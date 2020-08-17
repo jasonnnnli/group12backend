@@ -68,5 +68,5 @@ function getHash(pw, salt) {
 }
 
 module.exports = {
-    db, getHash, sendEmail
+    db, getHash, sendEmail,decrypt,encrypt
 };
