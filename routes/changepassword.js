@@ -1,70 +1,102 @@
-//TODO: Clean this class up
+//express is the framework we're going to use to handle requests
+const express = require('express');
 
-/**
- * Express used for https requests
- */
-const express = require("express");
-
-/**
- * Using express package routing
- */
-let router = express.Router();
-
-/**
- * sendRecoveryEmail function in utilities utilizing Nodemailer
- */
-let sendChangePasswordEmail = require('../utilities/utilsss').sendChangePasswordEmail;
-
-/**
- * Package for parsing JSON
- */
 const bodyParser = require("body-parser");
 
-/**
- * This allows parsing of the body of POST requests, that are encoded in JSON
- */
+//We use this create the SHA256 hash
+const crypto = require("crypto");
+
+//Create connection to Heroku Database
+let db = require('../utilities/utilsss').db;
+
+let getHash = require('../utilities/utilsss').getHash;
+
+let sendEmail = require('../utilities/utilsss').sendEmail;
+
+var router = express.Router();
 router.use(bodyParser.json());
-let pool = require('../utilities/utilsss').pool;
-let jwt = require('jsonwebtoken');
 
-/**
- * Config object for jwt creation
- */
-config = {
-    secret: process.env.JSON_SECRET
-};
-router.post('/changepassword', (request, response) => {
-    response.type("application/json");
-    const email = request.body.email;
+// Resets the users password given a valid email, password, and verification code
+router.post('/changepassword', (req, res) => {
+    var email = req.body['email'].toLowerCase();
+    var password = req.body['password'];
+    var code = req.body['code'];
+    if (email && password && code) {
+        // If the email doesn't include an "@" sign
+        if (!email.includes("@")) {
+            res.send({
+                success: false,
+                error: "Email is invalid."
+            })
+        }
+        else {
+            // Select the member with the given email
+            db.result(`SELECT * FROM MEMBERS
+                       WHERE EMAIL= $1`, [email])
+                .then(result => {
+                    // Get todays date
+                    var today = new Date();
+                    // Get the resetcode
+                    var resetcode = result.rows[0]["resetcode"];
+                    // Get the expiration of the code
+                    var expire = result.rows[0]["expire"];
+                    // If the code is expired
+                    if (!expire >= today) {
+                        res.send({
+                            success: false,
+                            error: "Code expired."
+                        })
+                    }
+                    else {
+                        // If the code doesn't match to the email provided
+                        if (code != resetcode) {
+                            res.send({
+                                success: false,
+                                error: "Code does not match to email provided."
+                            })
+                        }
+                        else {
+                            // Create a new hashed password
+                            let salt = crypto.randomBytes(32).toString("hex");
+                            let salted_hash = getHash(password, salt);
+                            // If the given password is too short
+                            if (password.length < 6) {
+                                res.send({
+                                    success: false,
+                                    error: "Password must be at least 6 characters long."
+                                });
+                            }
+                            else {
+                                // Update the database with the new information
+                                var params = [email, salted_hash, salt];
+                                db.none(`UPDATE MEMBERS 
+                                        SET Password = $2, Salt = $3, ResetCode = NULL, Expire = NULL 
+                                        WHERE EMAIL = $1`, params)
+                                    .then(() => {
+                                        res.send({
+                                            success: true
+                                        });
+                                        var message = "Your password has been updated.";
+                                        // Send a confirmation email
+                                        sendEmail(email, "Password Reset Confirmation", message);
+                                    })
+                            }
+                        }
+                    }
 
-    let theQuery = "SELECT FirstName, LastName FROM Members WHERE Email=$1";
-    let values = [email];
 
-    pool.query(theQuery, values)
-        .then(result => {
-            if (result.rowCount == 0) {
-                response.status(201).send({
-                    acknowledge: true,
-                });
-                return;
-            }
-            let first = result.rows[0].firstname;
-            let last = result.rows[0].lastname;
+                })
 
-            //send password reset email using firstname and lastname
-            sendChangePasswordEmail(email, first, last);
 
-            response.status(201).send({
-                acknowledge: true
-            });
-        })
-        .catch((err) => {
-            //unable to query, log error
-            //TODO: Okay for error response here?
-            response.status(400).send({
-                acknowledge: false,
-                message: err.detail
-            });
+        }
+        // If the email, password or code are not given.
+    } else {
+        res.send({
+            success: false,
+            input: req.body,
+            error: "Missing required user information."
         });
+    }
 });
+
 module.exports = router;

@@ -1,95 +1,60 @@
-/**
- * Gets the connection to our Heroku Database
- */
-let pool = require('./sql_conn.js');
-
-/**
- * Crypto module required for hashing
- */
+//Get the connection to Heroku Database
+let db = require('./sql_conn.js');
+//We use this create the SHA256 hash
 const crypto = require("crypto");
-
+const FormData = require("form-data");
+var nodemailer = require('nodemailer');
 /**
- * Nodemailer allows web service to send emails to users
+ * encrypt/decrypt found from : http://lollyrock.com/articles/nodejs-encryption/
  */
-const nodemailer = require("nodemailer");
-
-/**
- * Jsonwebtoken used for creating tokens/verifying
- */
-const jwt = require("jsonwebtoken");
-
-/**
- * Config object for jwt creation
- */
-config = {
-    secret: process.env.JSON_SECRET
-};
-
-/**
- * Nodemailer requires a transporter object for use; using gmail instead of
- * SMTP for now
- *
- * Server email password in environment variables
- */
-const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: process.env.EMAIL_SENDER,
-        pass: process.env.EMAIL_AUTH
-    }
-});
-
-/**
- * Sends an email via Nodemailer
- * @param from {String} email address of sender (Nodemailer will auto set to gmail account mail)
- * @param receiver {String} email address of recipient
- * @param subj {String} subject line
- * @param textMessage {String} email body text
- */
-function sendEmail(from, receiver, subj, textMessage/*, htmlMessage*/) {
-    let mailOptions = {
-        from: from,
-        to: receiver,
-        subject: subj,
-        text: textMessage/*,
-        html: htmlMessage*/
-    };
-
-    transporter.sendMail(mailOptions, function(error, info) {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log('Email sent: ' + info.response);
-        }
-    });
+function encrypt(text, key){
+    var cipher = crypto.createCipher('aes-256-cbc',key)
+    var crypted = cipher.update(text,'utf8','hex')
+    crypted += cipher.final('hex');
+    return crypted.substring(0, 20);
 }
 
+function decrypt(text, key){
+    var decipher = crypto.createDecipher('aes-256-cbc',key)
+    var dec = decipher.update(text,'hex','utf8')
+    dec += decipher.final('utf8');
+    return dec;
+}
 
-//TODO: Really Tyler? Abstract this out bruh... or just use sendEmail
-function sendChangePasswordEmail(receiver, first, last) {
-    let token = jwt.sign({email: receiver},
-        config.secret,
-        {
-            expiresIn: '1H' // expires in 1 hours
-        }
-    );
-    const subj = "Griffin Change Password Request";
+/**
+ * Function to send emails. Derived from : https://www.w3schools.com/nodejs/nodejs_email.asp
+ */
+function sendEmail(receiving, subject, message)
+{
+    console.log("Message: " + message);
+    db.one("SELECT Encrypted, Email, Key FROM GMAIL")
+        .then(row => {
+            let key = row['key'];
+            let password = decrypt(row['encrypted'], key);
+            let email = row['email'];
+            var transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: email,
+                    pass: password
+                }
+            });
 
-    // Nodemailer sends user verification link
-    let emailText = "Dear " + first + " " + last + ",\n\nSomebody has requested that the password"
-        + " tied to this email be changed. If this was not you, please contact support as your account may"
-        + " have been compromised!\n"
-        + "Please click on the following link to continue with the password change request"
-        + "; the link will expire in 1 hour.\n";
+            var mailOptions = {
+                sending: email,
+                to: receiving,
+                subject: subject,
+                text: message
+            };
 
-    //TODO: needs splash page
-    let passwordChangeLink = "https://team12-services-backend.herokuapp.com/support?mode=r&name=" + token;
-
-    // let recoveryLink = "http://localhost:5000/support?name=" + token;
-    // let emailHtml = emailText + '<a href="' + recoveryLink + token + '"><H2>Verification link</H2></a>';
-    emailText = emailText + passwordChangeLink;
-    sendEmail(process.env.EMAIL_SENDER, receiver, subj,
-        emailText);
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent.');
+                }
+            });
+        });
 }
 
 /**
@@ -102,8 +67,6 @@ function getHash(pw, salt) {
     return crypto.createHash("sha256").update(pw + salt).digest("hex");
 }
 
-
-
 module.exports = {
-    pool, getHash, sendChangePasswordEmail
+    db, getHash, sendEmail
 };
