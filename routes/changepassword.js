@@ -13,7 +13,7 @@ const bodyParser = require("body-parser");
 //This allows parsing of the body of POST requests, that are encoded in JSON
 router.use(bodyParser.json());
 
-router.post('/', (req, res) => {
+router.post('/changepassword', (req, res) => {
     let email = req.body['email'];
     let  firstname = req.body['firstname'];
     let  lastname = req.body['lastname'];
@@ -22,7 +22,7 @@ router.post('/', (req, res) => {
     let wasSuccessful = false;
     if(email && theirNewPw && firstname &&lastname &&username) {
         //Using the 'one' method means that only one row should be returned
-        db.one('SELECT Email FROM Members WHERE Email=$1 ，firstname=$2, lastname=$3,username=$4', [email],[firstname],[lastname],[username])
+        db.one('SELECT Email FROM Members WHERE Email=$1 ,firstnamev=$2, lastname=$3,username=$4', [email],[firstname],[lastname],[username])
             .then(row => { //If successful, run function passed into .then()
 
                 var newPassword = req.body['newPassword'];
