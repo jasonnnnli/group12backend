@@ -1,6 +1,4 @@
-//Get the connection to Heroku Database
 let db = require('./sql_conn.js');
-//We use this create the SHA256 hash
 const crypto = require("crypto");
 var nodemailer = require('nodemailer');
 
@@ -9,18 +7,16 @@ function sendEmail(receiving, subject, message)
     console.log("Message: " + message);
 
 
-    let transporter = nodemailer.createTransport({
-        host: "smtp.ethereal.email",
-        port: 587,
-        secure: false, // true for 465, false for other ports
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
         auth: {
-            user: 'gennaro.corwin@ethereal.email', // generated ethereal user
-            pass: 'pNrESCVmdNX2BpHUVx', // generated ethereal password
-        },
+            user: 'jasonnnnli1997@gmail.com',
+            pass: '97102401a.'
+        }
     });
 
             var mailOptions = {
-                sending: 'gennaro.corwin@ethereal.email',
+                sending: 'jasonnnnli1997@gmail.com',
                 to: receiving,
                 subject: subject,
                 text: message
