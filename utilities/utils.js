@@ -2,10 +2,7 @@
 let db = require('./sql_conn.js');
 //We use this create the SHA256 hash
 const crypto = require("crypto");
-const FormData = require("form-data");
 var nodemailer = require('nodemailer');
-
-
 
 function sendEmail(receiving, subject, message)
 {

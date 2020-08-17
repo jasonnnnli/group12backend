@@ -6,7 +6,7 @@ const crypto = require("crypto");
 //Create connection to Heroku Database
 let db = require('../utilities/utils').db;
 
-let sendEmail = require('../utilities/utils').sendEmail;
+let sendEmail = require('../utilities/utilss').sendEmail;
 
 const bodyParser = require("body-parser");
 
@@ -14,7 +14,7 @@ var router = express.Router();
 router.use(bodyParser.json());
 
 // Sends an email with a reset code to allow the user to reset their password
-router.post('/code', (req, res) => {
+router.post('/', (req, res) => {
     var email = req.body['email'];
     if (email) {
         if (!email.includes("@")) {
@@ -27,22 +27,7 @@ router.post('/code', (req, res) => {
         else {
             db.result("SELECT * FROM MEMBERS WHERE EMAIL= $1", [email])
                 .then(result => {
-                    if (result.rowCount == 0) {
-                        res.send({
-                            success: false,
-                            error: "Email doesn't belong to any account registered."
-                        })
-                    }
-                    else if (result.rowCount == 1) {
-                        var verify = result.rows[0]["verification"];
-                        if (!verify) {
-                            res.send({
-                                success: false,
-                                error: "Email must be confirmed in order to reset password."
-                            })
-                        }
-                        else
-                        {
+
                             var code = crypto.randomBytes(3).toString("hex");
                             var expire = new Date();
                             expire.setDate(expire.getDate() + 1);
@@ -53,9 +38,8 @@ router.post('/code', (req, res) => {
                                 success: true,
                                 message: "Email sent."
                             })
-                        }
-                    }
-                })
+                        })
+                 
         }
     } else {
         res.send({

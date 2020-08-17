@@ -21,7 +21,6 @@ router.post('/changepassword', (req, res) => {
     var password = req.body['password'];
     var code = req.body['code'];
     if (email && password && code) {
-        // If the email doesn't include an "@" sign
         if (!email.includes("@")) {
             res.send({
                 success: false,
@@ -39,7 +38,6 @@ router.post('/changepassword', (req, res) => {
                     var resetcode = result.rows[0]["resetcode"];
                     // Get the expiration of the code
                     var expire = result.rows[0]["expire"];
-                    // If the code is expired
                     if (!expire >= today) {
                         res.send({
                             success: false,
@@ -47,18 +45,15 @@ router.post('/changepassword', (req, res) => {
                         })
                     }
                     else {
-                        // If the code doesn't match to the email provided
                         if (code != resetcode) {
                             res.send({
                                 success: false,
-                                error: "Code does not match to email provided."
+                                error: "Code does not match."
                             })
                         }
                         else {
-                            // Create a new hashed password
                             let salt = crypto.randomBytes(32).toString("hex");
                             let salted_hash = getHash(password, salt);
-                            // If the given password is too short
                             if (password.length < 6) {
                                 res.send({
                                     success: false,
@@ -66,7 +61,7 @@ router.post('/changepassword', (req, res) => {
                                 });
                             }
                             else {
-                                // Update the database with the new information
+
                                 var params = [email, salted_hash, salt];
                                 db.none(`UPDATE MEMBERS 
                                         SET Password = $2, Salt = $3, ResetCode = NULL, Expire = NULL 
