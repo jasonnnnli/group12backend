@@ -1,102 +1,81 @@
-//express is the framework we're going to use to handle requests
 const express = require('express');
-
-const bodyParser = require("body-parser");
 
 //We use this create the SHA256 hash
 const crypto = require("crypto");
 
 //Create connection to Heroku Database
-let db = require('../utilities/utilsss').db;
+let db = require('../utilities/utils').db;
 
-let getHash = require('../utilities/utilsss').getHash;
+let getHash = require('../utilities/utils').getHash;
 
-let sendEmail = require('../utilities/utilsss').sendEmail;
+let sendPasswordEmail = require('../utilities/utils_mail').sendPasswordEmail;
+
 
 var router = express.Router();
+
+// Use a validator to check the users credentials
+const { check, validationResult } = require('express-validator/check');
+
+const bodyParser = require("body-parser");
+//This allows parsing of the body of POST requests, that are encoded in JSON
 router.use(bodyParser.json());
 
-// Resets the users password given a valid email, password, and verification code
-router.post('/changepassword', (req, res) => {
-    var email = req.body['email'].toLowerCase();
-    var password = req.body['password'];
-    var code = req.body['code'];
-    if (email && password && code) {
-        // If the email doesn't include an "@" sign
-        if (!email.includes("@")) {
-            res.send({
-                success: false,
-                error: "Email is invalid."
-            })
-        }
-        else {
-            // Select the member with the given email
-            db.result(`SELECT * FROM MEMBERS
-                       WHERE EMAIL= $1`, [email])
-                .then(result => {
-                    // Get todays date
-                    var today = new Date();
-                    // Get the resetcode
-                    var resetcode = result.rows[0]["resetcode"];
-                    // Get the expiration of the code
-                    var expire = result.rows[0]["expire"];
-                    // If the code is expired
-                    if (!expire >= today) {
-                        res.send({
-                            success: false,
-                            error: "Code expired."
-                        })
-                    }
-                    else {
-                        // If the code doesn't match to the email provided
-                        if (code != resetcode) {
-                            res.send({
-                                success: false,
-                                error: "Code does not match to email provided."
-                            })
-                        }
-                        else {
-                            // Create a new hashed password
-                            let salt = crypto.randomBytes(32).toString("hex");
-                            let salted_hash = getHash(password, salt);
-                            // If the given password is too short
-                            if (password.length < 6) {
-                                res.send({
-                                    success: false,
-                                    error: "Password must be at least 6 characters long."
+router.post('/', (req, res) => {
+    let email = req.body['email'];
+    // let theirNewPw = req.body['newPassword'];
+    //let wasSuccessful = false;
+    if(email) {
+        //Using the 'one' method means that only one row should be returned
+        db.one('SELECT Email FROM Members WHERE Email=$1', [email])
+            .then(row => { //If successful, run function passed into .then()
+
+                var newPassword = Math.floor((Math.random() * 412345) + 123456);
+
+                let salt = crypto.randomBytes(32).toString("hex");
+                let salted_hash = getHash(newPassword, salt);
+
+                let params = [salted_hash, salt, email];
+
+                db.none("UPDATE Members SET Password = $1, Salt = $2 WHERE Email = $3", params)
+                    .then(() => {
+                        sendPasswordEmail(email,newPassword)
+
+                            .then(result => {
+
+                                return res.send({
+                                    success: true,
+                                    msg: "Password email sent"
                                 });
-                            }
-                            else {
-                                // Update the database with the new information
-                                var params = [email, salted_hash, salt];
-                                db.none(`UPDATE MEMBERS 
-                                        SET Password = $2, Salt = $3, ResetCode = NULL, Expire = NULL 
-                                        WHERE EMAIL = $1`, params)
-                                    .then(() => {
-                                        res.send({
-                                            success: true
-                                        });
-                                        var message = "Your password has been updated.";
-                                        // Send a confirmation email
-                                        sendEmail(email, "Password Reset Confirmation", message);
-                                    })
-                            }
-                        }
-                    }
+
+                            });
 
 
-                })
+                    }).catch((err) => {
+                    //log the error
+                    // Not sure why we would have an error here, we would have just made the user account
+                    res.send({
+                        success: false,
+                        msg: "Email sent fail",
+                        error: err
 
+                    });
+                });
 
-        }
-        // If the email, password or code are not given.
+            })
+            //More than one row shouldn't be found, since table has constraint on it
+            .catch((err) => {
+                //If anything happened, it wasn't successful
+                res.send({
+                    success: false,
+                    msg: "Account not found!"
+                });
+            });
     } else {
+
         res.send({
             success: false,
-            input: req.body,
-            error: "Missing required user information."
+            msg: 'Email is required'
         });
     }
 });
-
 module.exports = router;
