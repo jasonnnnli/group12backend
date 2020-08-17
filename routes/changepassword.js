@@ -1,20 +1,13 @@
+//express is the framework we're going to use to handle requests
 const express = require('express');
-
-//We use this create the SHA256 hash
 const crypto = require("crypto");
+
+let router = express.Router();
+let getHash = require('../utilities/utils').getHash;
 
 //Create connection to Heroku Database
 let db = require('../utilities/utils').db;
 
-let getHash = require('../utilities/utils').getHash;
-
-let sendPasswordEmail = require('../utilities/utils_mail').sendPasswordEmail;
-
-
-var router = express.Router();
-
-// Use a validator to check the users credentials
-const { check, validationResult } = require('express-validator/check');
 
 const bodyParser = require("body-parser");
 //This allows parsing of the body of POST requests, that are encoded in JSON
@@ -22,14 +15,17 @@ router.use(bodyParser.json());
 
 router.post('/', (req, res) => {
     let email = req.body['email'];
-    // let theirNewPw = req.body['newPassword'];
-    //let wasSuccessful = false;
-    if(email) {
+    let  firstname = req.body['firstname'];
+    let  lastname = req.body['lastname'];
+    let   username = req.body['username'];
+    let theirNewPw = req.body['newPassword'];
+    let wasSuccessful = false;
+    if(email && theirNewPw && firstname &&lastname &&username) {
         //Using the 'one' method means that only one row should be returned
-        db.one('SELECT Email FROM Members WHERE Email=$1', [email])
+        db.one('SELECT Email FROM Members WHERE Email=$1 ，firstname=$2, lastname=$3,username=$4', [email],[firstname],[lastname],[username])
             .then(row => { //If successful, run function passed into .then()
 
-                var newPassword = Math.floor((Math.random() * 412345) + 123456);
+                var newPassword = req.body['newPassword'];
 
                 let salt = crypto.randomBytes(32).toString("hex");
                 let salted_hash = getHash(newPassword, salt);
@@ -38,16 +34,10 @@ router.post('/', (req, res) => {
 
                 db.none("UPDATE Members SET Password = $1, Salt = $2 WHERE Email = $3", params)
                     .then(() => {
-                        sendPasswordEmail(email,newPassword)
-
-                            .then(result => {
-
-                                return res.send({
-                                    success: true,
-                                    msg: "Password email sent"
-                                });
-
-                            });
+                        return res.send({
+                            success: true,
+                            message: "Password changed"
+                        });
 
 
                     }).catch((err) => {
@@ -55,8 +45,8 @@ router.post('/', (req, res) => {
                     // Not sure why we would have an error here, we would have just made the user account
                     res.send({
                         success: false,
-                        msg: "Email sent fail",
-                        error: err
+
+                        error: "Couldn't update member's password"
 
                     });
                 });
@@ -67,15 +57,16 @@ router.post('/', (req, res) => {
                 //If anything happened, it wasn't successful
                 res.send({
                     success: false,
-                    msg: "Account not found!"
+                    message: "Account not found!"
                 });
             });
     } else {
 
         res.send({
             success: false,
-            msg: 'Email is required'
+            message: 'Email ,fisrname,lastname,username and Password are required'
         });
     }
 });
+
 module.exports = router;
