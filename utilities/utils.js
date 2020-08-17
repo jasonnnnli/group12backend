@@ -32,12 +32,15 @@ function sendEmail(receiving, subject, message)
             let key = row['key'];
             let password = decrypt(row['encrypted'], key);
             let email = row['email'];
+
             var transporter = nodemailer.createTransport({
-                service: 'gmail',
+                host: "smtp.ethereal.email",
+                port: 587,
+                secure: false, // true for 465, false for other ports
                 auth: {
-                    user: email,
-                    pass: password
-                }
+                    user: 'gennaro.corwin@ethereal.email', // generated ethereal user
+                    pass: 'pNrESCVmdNX2BpHUVx', // generated ethereal password
+                },
             });
 
             var mailOptions = {
