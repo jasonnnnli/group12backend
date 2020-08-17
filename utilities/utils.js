@@ -1,12 +1,9 @@
 //Get the connection to Heroku Database
-
-let db = require('./sqlconn.js');
-
+let db = require('./sql_conn.js');
 //We use this create the SHA256 hash
 const crypto = require("crypto");
 const FormData = require("form-data");
-const nodemailer = require('nodemailer');
-
+var nodemailer = require('nodemailer');
 /**
  * encrypt/decrypt found from : http://lollyrock.com/articles/nodejs-encryption/
  */
@@ -23,6 +20,10 @@ function decrypt(text, key){
     dec += decipher.final('utf8');
     return dec;
 }
+
+/**
+ * Function to send emails. Derived from : https://www.w3schools.com/nodejs/nodejs_email.asp
+ */
 function sendEmail(receiving, subject, message)
 {
     console.log("Message: " + message);
@@ -56,7 +57,6 @@ function sendEmail(receiving, subject, message)
         });
 }
 
-
 /**
  * Method to get a salted hash.
  * We put this in its own method to keep consistency
@@ -68,5 +68,5 @@ function getHash(pw, salt) {
 }
 
 module.exports = {
-    db, getHash, sendEmail,decrypt,encrypt
+    db, getHash, sendEmail
 };
