@@ -27,23 +27,20 @@ function decrypt(text, key){
 function sendEmail(receiving, subject, message)
 {
     console.log("Message: " + message);
-    db.one("SELECT Encrypted, Email, Key FROM GMAIL")
-        .then(row => {
-            let key = row['key'];
-            let password = decrypt(row['encrypted'], key);
-            let email = row['email'];
-            var transporter = nodemailer.createTransport({
-                host: "smtp.ethereal.email",
-                port: 587,
-                secure: false, // true for 465, false for other ports
-                auth: {
-                    user: 'gennaro.corwin@ethereal.email', // generated ethereal user
-                    pass: 'pNrESCVmdNX2BpHUVx', // generated ethereal password
-                },
-            });
+
+
+    let transporter = nodemailer.createTransport({
+        host: "smtp.ethereal.email",
+        port: 587,
+        secure: false, // true for 465, false for other ports
+        auth: {
+            user: 'gennaro.corwin@ethereal.email', // generated ethereal user
+            pass: 'pNrESCVmdNX2BpHUVx', // generated ethereal password
+        },
+    });
 
             var mailOptions = {
-                sending: email,
+                sending: 'gennaro.corwin@ethereal.email',
                 to: receiving,
                 subject: subject,
                 text: message
@@ -56,7 +53,7 @@ function sendEmail(receiving, subject, message)
                     console.log('Email sent.');
                 }
             });
-        });
+
 }
 
 /**
