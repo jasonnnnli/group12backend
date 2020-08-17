@@ -18,9 +18,9 @@ router.post('/changepassword', (req, res) => {
     let  firstname = req.body['firstname'];
     let  lastname = req.body['lastname'];
     let   username = req.body['username'];
-    let theirNewPw = req.body['newPassword'];
+    let newPassword = req.body['newPassword'];
     let wasSuccessful = false;
-    if(email && theirNewPw && firstname &&lastname &&username) {
+    if(email && firstname &&lastname && username && newPassword) {
         //Using the 'one' method means that only one row should be returned
         db.one('SELECT Email FROM Members WHERE Email=$1 ,firstnamev=$2, lastname=$3,username=$4', [email],[firstname],[lastname],[username])
             .then(row => { //If successful, run function passed into .then()
