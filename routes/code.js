@@ -3,7 +3,7 @@ const express = require('express');
 
 const crypto = require("crypto");
 
-//Create connection to Heroku Database
+
 let db = require('../utilities/utils').db;
 
 let sendEmail = require('../utilities/utilss').sendEmail;
@@ -13,8 +13,7 @@ const bodyParser = require("body-parser");
 var router = express.Router();
 router.use(bodyParser.json());
 
-// Sends an email with a reset code to allow the user to reset their password
-router.post('/', (req, res) => {
+router.post('/code', (req, res) => {
     var email = req.body['email'];
     if (email) {
         if (!email.includes("@")) {
@@ -39,7 +38,7 @@ router.post('/', (req, res) => {
                                 message: "Email sent."
                             })
                         })
-                 
+
         }
     } else {
         res.send({
