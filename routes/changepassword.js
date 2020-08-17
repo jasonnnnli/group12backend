@@ -7,11 +7,11 @@ const bodyParser = require("body-parser");
 const crypto = require("crypto");
 
 //Create connection to Heroku Database
-let db = require('../utilities/utilss').db;
+let db = require('../utilities/utils').db;
 
-let getHash = require('../utilities/utilss').getHash;
+let getHash = require('../utilities/utils').getHash;
 
-let sendEmail = require('../utilities/utilss').sendEmail;
+let sendEmail = require('../utilities/utils').sendEmail;
 
 var router = express.Router();
 router.use(bodyParser.json());

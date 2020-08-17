@@ -4,9 +4,9 @@ const express = require('express');
 const crypto = require("crypto");
 
 //Create connection to Heroku Database
-let db = require('../utilities/utilss').db;
+let db = require('../utilities/utils').db;
 
-let sendEmail = require('../utilities/utilss').sendEmail;
+let sendEmail = require('../utilities/utils').sendEmail;
 
 const bodyParser = require("body-parser");
 
