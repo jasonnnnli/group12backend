@@ -16,7 +16,6 @@ let sendEmail = require('../utilities/utils').sendEmail;
 var router = express.Router();
 router.use(bodyParser.json());
 
-// Resets the users password given a valid email, password, and verification code
 router.post('/changepassword', (req, res) => {
     var email = req.body['email'].toLowerCase();
     var password = req.body['password'];
