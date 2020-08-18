@@ -50,7 +50,7 @@ router.post('/', (req, res) => {
                         .then((data) => {
                             res.send({
                                 success: true,
-                                members: data['username']
+                                members: data[0]['username']
                             });
                         }).catch((error) => {
                         console.log(error);
