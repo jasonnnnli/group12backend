@@ -47,7 +47,7 @@ router.post('/', (req, res) => {
                     //package and send the results
                     res.json({
                         success: true,
-                        message: row['Username'],
+                        message: row,
                         token: token
                     });
                 } else {
