@@ -24,12 +24,12 @@ router.post('/', (req, res) => {
     let wasSuccessful = false;
     if(email && theirPw) {
         //Using the 'one' method means that only one row should be returned
-        db.one('SELECT Password, Salt FROM Members WHERE Email=$1', [email])
+        db.one('SELECT Password, Salt,Username FROM Members WHERE Email=$1', [email])
             .then(row => { //If successful, run function passed into .then()
                 let salt = row['salt'];
                 //Retrieve our copy of the password
                 let ourSaltedHash = row['password'];
-
+                let Username = row['Username'];
                 //Combined their password with our salt, then hash
                 let theirSaltedHash = getHash(theirPw, salt);
 
@@ -38,7 +38,7 @@ router.post('/', (req, res) => {
 
                 if (wasCorrectPw) {
                     //credentials match. get a new JWT
-                    let token = jwt.sign({username: email},
+                    let token = jwt.sign({usernames: email},
                         config.secret,
                         {
                             expiresIn: '24h' // expires in 24 hours
@@ -47,7 +47,7 @@ router.post('/', (req, res) => {
                     //package and send the results
                     res.json({
                         success: true,
-                        message: 'Authentication successful!',
+                        message: username,
                         token: token
                     });
                 } else {
