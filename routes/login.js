@@ -50,8 +50,8 @@ router.post('/', (req, res) => {
                         .then((data) => {
                             res.send({
                                 success: true,
-                                message:Username,
-                                token: token
+                                message:Username
+                              
                             });
                         }).catch((error) => {
                         console.log(error);
