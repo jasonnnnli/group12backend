@@ -45,10 +45,19 @@ router.post('/', (req, res) => {
                         }
                     );
                     //package and send the results
-                    res.json({
-                        success: true,
-                        message: row,
-                        token: token
+                    db.manyOrNone('SELECT Username FROM members')
+                        //If successful, run function passed into .then()
+                        .then((data) => {
+                            res.send({
+                                success: true,
+                                members: data
+                            });
+                        }).catch((error) => {
+                        console.log(error);
+                        res.send({
+                            success: false,
+                            error: error
+                        })
                     });
                 } else {
                     //credentials did not match
