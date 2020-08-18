@@ -29,7 +29,7 @@ router.post('/', (req, res) => {
                 let salt = row['salt'];
                 //Retrieve our copy of the password
                 let ourSaltedHash = row['password'];
-                let Username = row['Username'];
+                let Usernames = row['Username'];
                 //Combined their password with our salt, then hash
                 let theirSaltedHash = getHash(theirPw, salt);
 
@@ -47,7 +47,7 @@ router.post('/', (req, res) => {
                     //package and send the results
                     res.json({
                         success: true,
-                        Members:row,
+                        message: Usernames,
                         token: token
                     });
                 } else {
