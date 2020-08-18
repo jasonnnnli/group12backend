@@ -28,7 +28,8 @@ router.post('/', (req, res) => {
             .then(row => { //If successful, run function passed into .then()
                 let salt = row['salt'];
                 //Retrieve our copy of the password
-                let ourSaltedHash = row['password']
+                let ourSaltedHash = row['password'];
+
                 //Combined their password with our salt, then hash
                 let theirSaltedHash = getHash(theirPw, salt);
 
@@ -37,7 +38,7 @@ router.post('/', (req, res) => {
 
                 if (wasCorrectPw) {
                     //credentials match. get a new JWT
-                    let token = jwt.sign({usernames: Username},
+                    let token = jwt.sign({username: email},
                         config.secret,
                         {
                             expiresIn: '24h' // expires in 24 hours
@@ -46,7 +47,7 @@ router.post('/', (req, res) => {
                     //package and send the results
                     res.json({
                         success: true,
-                        message: row['Username'],
+                        message: 'Authentication successful!',
                         token: token
                     });
                 } else {
