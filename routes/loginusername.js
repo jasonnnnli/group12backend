@@ -47,7 +47,7 @@ router.post('/loginusername', (req, res) => {
                     //package and send the results
                     res.json({
                         success: true,
-                        Members: row['Username'],
+                        message: 'Authentication successful!',
                         token: token
                     });
                 } else {
