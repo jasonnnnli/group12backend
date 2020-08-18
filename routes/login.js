@@ -45,7 +45,7 @@ router.post('/', (req, res) => {
                         }
                     );
                     //package and send the results
-                    db.manyOrNone('SELECT Username FROM members')
+                    db.manyOrNone('SELECT Username FROM members WHERE Email = $1',[email])
                         //If successful, run function passed into .then()
                         .then((data) => {
                             res.send({
