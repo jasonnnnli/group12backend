@@ -13,7 +13,7 @@ router.post("/addfeature", (req, res) => {
     let featurecontent = req.body['featurecontent'];
 
 
-    if (Username && Devicename && Reviewcontent && Rating) {
+    if (featurecontent && Devicename) {
         db.none("INSERT INTO feature VALUES ($1, $2)", [ Devicename, featurecontent])
             .then(() => {
                 //We successfully added the course, let the user know
