@@ -35,6 +35,8 @@ app.use('/', require('./routes/listreview.js'));
 app.use('/', require('./routes/addreview.js'));
 app.use('/', require('./routes/loginusername.js'))
 app.use('/', require('./routes/changepassword.js'))
+app.use('/', require('./routes/listfeature.js'));
+app.use('/', require('./routes/addfeature.js'));
 
 
 app.get("/wait", (req, res) => {
